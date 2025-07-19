@@ -1,0 +1,4 @@
+slack_sdk[socket_mode]
+aiohttp          # pulled in by extras
+python-dotenv
+requests
