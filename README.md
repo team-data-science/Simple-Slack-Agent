@@ -52,3 +52,8 @@ docker run --env-file .env --network=host slack-llm-bot
 ## ✅ Done!
 
 Now just send a question in your Slack channel, and your bot will respond right in the thread.
+
+## Quick git reminder
+git add .
+git commit -m "first working version."
+git push origin main
