@@ -1,4 +1,5 @@
-slack_sdk[socket_mode]
-aiohttp          # pulled in by extras
-python-dotenv
-requests
+slack_sdk[socket_mode]          # for Socket Mode integration
+langchain                       # core framework: chains, prompts, memory
+langchain-ollama                # Ollama connector for LangChain
+python-dotenv                   # load environment variables
+requests                        # HTTP for other calls if needed
