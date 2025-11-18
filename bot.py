@@ -21,34 +21,47 @@ logger.info(f"Bot user ID: {BOT_USER_ID}")
 
 
 def process(client: SocketModeClient, req: SocketModeRequest):
+    
+    # Only handle standard message events
     if req.type != "events_api":
         return
+    
+    # Always ACK the event so Slack stops retrying it
     client.send_socket_mode_response({"envelope_id": req.envelope_id})
 
     event = req.payload.get("event", {})
-    # Only handle human text messages
+    
+     # Ignore bot messages or events without text
     if "text" not in event or event.get("bot_id") or event.get("user") == BOT_USER_ID:
         return
 
     user_input = event["text"]
     channel = event["channel"]
-    thread_ts = event.get("thread_ts") or event["ts"]
 
+    # Respond in-thread. If no thread exists, Slack uses the main ts.
+    thread_ts = event.get("thread_ts") or event["ts"]
     logger.info(f"Received from {event.get('user')}: {user_input}")
+    
+    # Forward message to local LLM (Ollama)
     reply = ask_llm(user_input)
     logger.info(f"Replying: {reply}")
 
+    # Send LLM response back into Slack
     web_client.chat_postMessage(
         channel=channel,
         text=reply,
         thread_ts=thread_ts
     )
 
-
 if __name__ == "__main__":
+    # Register the event processor callback
     socket_client.socket_mode_request_listeners.append(process)
     print("Starting Slack Agent...", flush=True)
+    
+    # Open the WebSocket connection to Slack (non-blocking)
     socket_client.connect()
+    
+    # Keep the process alive so events keep streaming
     try:
         while True:
             time.sleep(1)

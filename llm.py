@@ -24,7 +24,8 @@ Human: {input}
 Assistant:"""
 )
 
-# RunnableSequence with memory loaded per invocation
+# RunnableSequence that takes prompt and the llm. you could argue that this is overkill, 
+# because it's just one step. But with this adding e.g. tranformation features is super easy.
 _chain = RunnableSequence(_prompt, _llm)
 
 
@@ -37,10 +38,10 @@ def ask_llm(question: str) -> str:
     mem_vars = _memory.load_memory_variables(inputs)
     chain_inputs = {**mem_vars, **inputs}
 
-    # Invoke model
+    # Invoke the runnable sequence (options are: invoke, stream, batch)
     result = _chain.invoke(chain_inputs)
 
-    # Extract reply
+    # Extract reply - LangChain can return different shapes depending on the model wrapper:
     if isinstance(result, str):
         reply = result
     elif isinstance(result, dict):
@@ -48,7 +49,7 @@ def ask_llm(question: str) -> str:
     else:
         reply = str(result)
 
-    # Save context
+    # Save converstaion context into memory
     try:
         _memory.save_context(chain_inputs, {"output": reply})
     except Exception:
