@@ -1,5 +1,5 @@
 slack_sdk[socket_mode]          # for Socket Mode integration
-langchain                       # core framework: chains, prompts, memory
-langchain-ollama                # Ollama connector for LangChain
+langchain==0.2.14               # core framework: chains, prompts, memory
+langchain-ollama==0.1.3         # Ollama connector for LangChain
 python-dotenv                   # load environment variables
 requests                        # HTTP for other calls if needed

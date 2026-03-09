@@ -45,7 +45,7 @@ def ask_llm(question: str) -> str:
     mem_vars = _memory.load_memory_variables(inputs)
 
     # DEBUG: log chat history
-    logger.info(f"Current chat memory: {mem_vars.get('chat_history')}")
+    # logger.info(f"Current chat memory: {mem_vars.get('chat_history')}")
 
     chain_inputs = {**mem_vars, **inputs}
 
