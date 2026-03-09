@@ -1,9 +1,14 @@
 import os
+import logging
 from config import OLLAMA_API_URL
 from langchain_ollama import OllamaLLM
 from langchain.memory import ConversationBufferWindowMemory
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables.base import RunnableSequence
+
+# Logging setup
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Initialize Ollama LLM with HTTP API base URL
 _llm = OllamaLLM(model="mistral", base_url=OLLAMA_API_URL)
@@ -35,8 +40,18 @@ def ask_llm(question: str) -> str:
     """
     # Prepare input and memory
     inputs = {"input": question}
+    
+    # Load memory
     mem_vars = _memory.load_memory_variables(inputs)
+
+    # DEBUG: log chat history
+    logger.info(f"Current chat memory: {mem_vars.get('chat_history')}")
+
     chain_inputs = {**mem_vars, **inputs}
+
+    # DEBUG: full prompt sent to llm
+    formatted_prompt = _prompt.format(**chain_inputs)
+    logger.info(f"Prompt sent to LLM: {formatted_prompt}")
 
     # Invoke the runnable sequence (options are: invoke, stream, batch)
     result = _chain.invoke(chain_inputs)
