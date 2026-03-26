@@ -1,15 +1,17 @@
 # 🧠 Project 1: Local Slack LLM Agent
 
-This is a fully local Slack bot that:
-- Listens to questions in Slack using the WebSocket API (Socket Mode)
-- Sends them to a local Ollama model (e.g., Mistral)
-- Replies directly in the same Slack thread
+This is a fully local Slack bot that listens to questions in Slack using the WebSocket API (Socket Mode) and replies directly in the same thread.
+
+It includes two agent modes:
+- **Simple agent** (`llm_simple`) — forwards questions to a local Ollama model (e.g. Mistral) and returns the answer directly
+- **Reasoning agent** (`llm_reasoning`) — uses LangChain's tool-calling agent to reason about the question and decide whether to call external tools, such as the Databricks API, to retrieve pipeline run information
 
 ## 🧱 Stack
 - Python
 - Slack SDK (`slack_sdk`)
 - Local LLM via Ollama
-- No FastAPI, no LangChain, no cloud
+- LangChain (for the reasoning agent)
+- Databricks API (as an example tool for the reasoning agent)
 
 ---
 
