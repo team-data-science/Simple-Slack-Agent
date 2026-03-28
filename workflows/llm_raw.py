@@ -1,3 +1,6 @@
+# This is the old version how to build a workflow.
+# It's a great way though to show you the simplification later
+
 import os
 import logging
 from config import OLLAMA_API_URL
