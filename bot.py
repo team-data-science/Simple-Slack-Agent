@@ -4,7 +4,7 @@ from slack_sdk.web import WebClient
 from slack_sdk.socket_mode import SocketModeClient
 from slack_sdk.socket_mode.request import SocketModeRequest
 from config import SLACK_BOT_TOKEN, SLACK_APP_TOKEN
-from agents.llm_reasoning_new_style import ask_llm
+from agents.llm_langgraph import ask_llm
 
 # Logging setup
 logging.basicConfig(level=logging.INFO)
