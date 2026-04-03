@@ -6,6 +6,7 @@ from config import OLLAMA_API_URL
 from langchain.tools import tool
 from langchain.agents import create_agent
 from langchain_ollama import ChatOllama
+from langchain_core.runnables import RunnableLambda
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -51,9 +52,7 @@ def get_pipeline_runs(pipeline_id: str) -> str:
         )
 
     url = f"{databricks_host}/api/2.0/pipelines/{pipeline_id}/events"
-    headers = {
-        "Authorization": f"Bearer {databricks_token}"
-    }
+    headers = {"Authorization": f"Bearer {databricks_token}"}
 
     try:
         response = requests.get(url, headers=headers, timeout=30)
@@ -85,7 +84,7 @@ tools = [get_pipeline_runs]
 # Create the agent
 # ------------------------------------------------------------
 
-agent = create_agent(
+_agent = create_agent(
     model=_llm,
     tools=tools,
     system_prompt=(
@@ -111,22 +110,31 @@ def add_robot(text: str) -> str:
 
 
 # ------------------------------------------------------------
+# Pipeline: agent → extract reply → add robot emoji
+#
+# The agent returns a dict with a "messages" key: a list of all messages
+# exchanged during reasoning (user input, tool calls, tool results, final answer).
+# [-1] grabs the last message in that list, which is always the agent's final answer.
+#
+# Without a pipeline you would invoke the agent directly and
+# post-process the result manually:
+#
+#   result = _agent.invoke({"messages": [{"role": "user", "content": question}]})
+#   reply = add_robot(result["messages"][-1].content)
+# ------------------------------------------------------------
+
+pipeline = (
+    _agent
+    | RunnableLambda(lambda r: add_robot(r["messages"][-1].content))
+)
+
+
+# ------------------------------------------------------------
 # Main interface used by the Slack bot
 # ------------------------------------------------------------
 
 def ask_llm(question: str) -> str:
     logger.info("User question: %s", question)
-
-    result = agent.invoke(
-        {
-            "messages": [
-                {"role": "user", "content": question}
-            ]
-        }
-    )
-
-    reply = result["messages"][-1].content
-
+    reply = pipeline.invoke({"messages": [{"role": "user", "content": question}]})
     logger.info("Agent reply: %s", reply)
-
-    return add_robot(reply)
+    return reply
