@@ -1,5 +1,7 @@
 # 🧠 Project 1: Local Slack LLM Agent
 
+> **Taking the course?** Start with the [course overview](course/README.md). It takes you through the bot level by level, from a raw LLM call to a LangGraph agent.
+
 This is a fully local Slack bot that listens to questions in Slack using the WebSocket API (Socket Mode) and replies directly in the same thread.
 
 It includes two agent modes:
